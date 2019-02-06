@@ -169,6 +169,10 @@ class Backend(BaseBackend):
     def orders(self):
         self._process_orders()
         return self._orders
+    
+    def all_orders(self, *args, **kwargs):
+        self._process_orders()
+        return self._orders
 
     def batch_order(self, args):
         return [self.order(*order) for order in args]
