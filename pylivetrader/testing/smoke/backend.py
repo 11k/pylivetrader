@@ -169,6 +169,10 @@ class Backend(BaseBackend):
     def orders(self):
         self._process_orders()
         return self._orders
+
+    def get_order(self, zp_order_id):
+        self._process_orders()
+        return self._orders[zp_order_id]
     
     def all_orders(self, *args, **kwargs):
         self._process_orders()
