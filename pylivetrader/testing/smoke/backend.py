@@ -5,6 +5,7 @@ import pylivetrader.protocol as zp
 from pylivetrader.assets import Equity
 from pylivetrader.finance.order import (
     Order as ZPOrder,
+    ORDER_STATUS
 )
 from pylivetrader.backend.base import BaseBackend
 import pandas as pd
@@ -127,7 +128,8 @@ class Backend(BaseBackend):
             return
 
         for order in list(self._orders.values()):
-            if order.amount == order.filled:
+            if (order.amount == order.filled or
+                order.status is ORDER_STATUS.CANCELLED):
                 continue
 
             asset = order.asset
@@ -202,7 +204,7 @@ class Backend(BaseBackend):
 
     def cancel_order(self, zp_order_id):
         if zp_order_id in self._orders:
-            del self._orders[zp_order_id]
+            self._orders[zp_order_id]._status = ORDER_STATUS.CANCELLED
 
     def get_equities(self):
         return self._data_proxy.get_equities()
