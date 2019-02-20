@@ -96,9 +96,8 @@ class Backend(BaseBackend):
         return pd.Timestamp.now(tz='America/New_York')
 
     def _fill(self, order, price):
-        '''Fill the order at this price and delete the order
-        from the pending list.'''
-        del self._orders[order.id]
+        '''Fill the order at this price.'''
+        self._orders[order.id].filled = order.amount
         pos = self._positions.pop(order.asset, None)
         if pos is None:
             pos = zp.Position(order.asset)
@@ -126,8 +125,11 @@ class Backend(BaseBackend):
     def _process_orders(self):
         if self._last_process_time == self.now:
             return
-        # materialize the list so that _fill() can delete entry.
+
         for order in list(self._orders.values()):
+            if order.amount == order.filled:
+                continue
+
             asset = order.asset
             price_df = self.get_bars([asset], '1m')[asset]
             price_df = price_df[order.dt:]
